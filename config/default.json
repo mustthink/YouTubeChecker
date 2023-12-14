@@ -1,0 +1,13 @@
+{
+  "interval_in_seconds": 600,
+  "caller": {
+    "count_result": 10,
+    "query": "some",
+    "api_key": "-"
+  },
+  "sheet": {
+    "credentials_path": "config/credentials.json",
+    "name": "videos",
+    "id": "-"
+  }
+}

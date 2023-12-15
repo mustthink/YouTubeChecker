@@ -21,7 +21,7 @@ const (
 	insertVideo = `INSERT INTO videos (videoID, videoTitle, channelID, channelTitle, description, publishDate, videoURL, thumbnailURL)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
-	readVideos = `SELECT * FROM videos`
+	readVideos = `SELECT videoID FROM videos`
 )
 
 func (s *VideoStorage) InitDB() error {
@@ -44,13 +44,12 @@ func (s *VideoStorage) ReadVideos() error {
 
 	for rows.Next() {
 		var video Video
-		err = rows.Scan(&video.videoID, &video.videoTitle, &video.channelID, &video.channelTitle,
-			&video.description, &video.publishDate, &video.videoURL, &video.thumbnailURL)
+		err = rows.Scan(&video.videoID)
 		if err != nil {
 			return fmt.Errorf("couldn't scan videos from db w err: %s", err.Error())
 		}
 
-		s.videos[video.videoID] = video
+		s.videos[video.videoID] = exist
 	}
 	return nil
 }

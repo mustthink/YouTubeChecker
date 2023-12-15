@@ -58,6 +58,10 @@ func New(cfg *config.SheetConfig) (*VideoStorage, error) {
 		return nil, fmt.Errorf("couldn't init db w err: %s", err.Error())
 	}
 
+	if err := storage.ReadVideos(); err != nil {
+		return nil, fmt.Errorf("couldn't read videos w err: %s", err.Error())
+	}
+
 	return storage, err
 }
 

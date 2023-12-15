@@ -77,13 +77,12 @@ func (a *App) ProcessResponse(response *youtube.SearchListResponse) {
 	for _, item := range response.Items {
 		channelID := item.Snippet.ChannelId
 		a.logger.Debugf("channelID: %s", channelID)
-		if !a.config.IsChannelTracked(channelID) {
-			continue
-		}
 
 		videoID := item.Id.VideoId
+		a.logger.Debugf("videoID: %s", videoID)
+
 		if !a.videoStorage.IsVideoExist(videoID) {
-			video := storage.ToVideo(item)
+			video := storage.ToVideo(item, a.config.IsChannelTracked(channelID))
 			if err := a.videoStorage.AddNewVideo(video); err != nil {
 				a.logger.Errorf("couldn't add new video w err: %s", err.Error())
 			}

@@ -13,6 +13,8 @@ import (
 	"github.com/mustthink/YouTubeChecker/config"
 )
 
+var exist = struct{}{}
+
 type (
 	Video struct {
 		videoID      string
@@ -23,13 +25,14 @@ type (
 		publishDate  string
 		videoURL     string
 		thumbnailURL string
+		isTracked    bool
 	}
 
 	VideoStorage struct {
 		config *config.SheetConfig
 		db     *sql.DB
 		sheets *sheets.Service
-		videos map[string]Video
+		videos map[string]struct{}
 	}
 )
 
@@ -49,7 +52,7 @@ func New(cfg *config.SheetConfig) (*VideoStorage, error) {
 		config: cfg,
 		db:     db,
 		sheets: sheetsService,
-		videos: make(map[string]Video),
+		videos: make(map[string]struct{}),
 	}
 	if err := storage.InitDB(); err != nil {
 		return nil, fmt.Errorf("couldn't init db w err: %s", err.Error())
@@ -64,14 +67,14 @@ func (s *VideoStorage) IsVideoExist(id string) bool {
 }
 
 func (s *VideoStorage) AddNewVideo(v Video) error {
-	s.videos[v.videoID] = v
+	s.videos[v.videoID] = exist
 	if err := s.InsertVideoToDB(v); err != nil {
 		return err
 	}
 	return s.writeToSheet(v)
 }
 
-func ToVideo(item *youtube.SearchResult) Video {
+func ToVideo(item *youtube.SearchResult, isTracked bool) Video {
 	return Video{
 		videoID:      item.Id.VideoId,
 		videoTitle:   item.Snippet.Title,
@@ -81,5 +84,6 @@ func ToVideo(item *youtube.SearchResult) Video {
 		publishDate:  item.Snippet.PublishedAt,
 		videoURL:     fmt.Sprintf("https://www.youtube.com/watch?v=%s", item.Id.VideoId),
 		thumbnailURL: item.Snippet.Thumbnails.High.Url,
+		isTracked:    isTracked,
 	}
 }

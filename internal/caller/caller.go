@@ -46,6 +46,11 @@ func (c *Caller) FetchNewVideos() (*youtube.SearchListResponse, error) {
 		return nil, err
 	}
 
+	err = os.Mkdir("internal/caller/responses", 0755)
+	if err != nil && !os.IsExist(err) {
+		return nil, err
+	}
+
 	return response, c.WriteResponse(*response)
 }
 

@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"fmt"
+
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -13,6 +15,7 @@ func (s *VideoStorage) writeToSheet(video Video) error {
 		Values: values,
 	}
 
-	_, err := s.sheets.Spreadsheets.Values.Append(s.config.SpreadsheetID, "A1", valueRange).ValueInputOption("RAW").Do()
+	range_ := fmt.Sprintf("%s!A1", s.config.Name)
+	_, err := s.sheets.Spreadsheets.Values.Append(s.config.SpreadsheetID, range_, valueRange).ValueInputOption("RAW").Do()
 	return err
 }

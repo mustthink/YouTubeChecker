@@ -8,7 +8,9 @@ import (
 
 	"github.com/mustthink/YouTubeChecker/config"
 	"github.com/mustthink/YouTubeChecker/internal/caller"
+	"github.com/mustthink/YouTubeChecker/internal/notifications"
 	"github.com/mustthink/YouTubeChecker/internal/storage"
+	"github.com/mustthink/YouTubeChecker/internal/types"
 )
 
 type App struct {
@@ -46,6 +48,15 @@ func NewApplication(configPath string, isDebug bool) *App {
 	}
 	logger.Debug("successfully created storage")
 
+	logger.Debug("start creating notificator")
+	notificator, err := notifications.New(config.NotificatorConfig)
+	if err != nil {
+		logger.Fatalf("couldn't create notificator w err: %s", err.Error())
+	}
+	logger.Debug("successfully created notificator")
+	logger.Debug("notificator start serving")
+	go notificator.Serve()
+
 	logger.Info("successfully initiated application")
 	return &App{
 		config:       config,
@@ -82,7 +93,7 @@ func (a *App) ProcessResponse(response *youtube.SearchListResponse) {
 		a.logger.Debugf("videoID: %s", videoID)
 
 		if !a.videoStorage.IsVideoExist(videoID) {
-			video := storage.ToVideo(item, a.config.IsChannelTracked(channelID))
+			video := types.ToVideo(item, a.config.IsChannelTracked(channelID))
 			if err := a.videoStorage.AddNewVideo(video); err != nil {
 				a.logger.Errorf("couldn't add new video w err: %s", err.Error())
 			}

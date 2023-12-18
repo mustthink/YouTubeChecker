@@ -2,6 +2,8 @@ package storage
 
 import (
 	"fmt"
+
+	"github.com/mustthink/YouTubeChecker/internal/types"
 )
 
 const (
@@ -29,9 +31,9 @@ func (s *VideoStorage) InitDB() error {
 	return err
 }
 
-func (s *VideoStorage) InsertVideoToDB(v Video) error {
-	_, err := s.db.Exec(insertVideo, v.videoID, v.videoTitle, v.channelID, v.channelTitle,
-		v.description, v.publishDate, v.videoURL, v.thumbnailURL)
+func (s *VideoStorage) InsertVideoToDB(v types.Video) error {
+	_, err := s.db.Exec(insertVideo, v.VideoID, v.VideoTitle, v.ChannelID, v.ChannelTitle,
+		v.Description, v.PublishDate, v.VideoURL, v.ThumbnailURL)
 	return err
 }
 
@@ -43,13 +45,13 @@ func (s *VideoStorage) ReadVideos() error {
 	defer rows.Close()
 
 	for rows.Next() {
-		var video Video
-		err = rows.Scan(&video.videoID)
+		var video types.Video
+		err = rows.Scan(&video.VideoID)
 		if err != nil {
 			return fmt.Errorf("couldn't scan videos from db w err: %s", err.Error())
 		}
 
-		s.videos[video.videoID] = exist
+		s.videos[video.VideoID] = exist
 	}
 	return nil
 }

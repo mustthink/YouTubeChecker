@@ -4,11 +4,13 @@ import (
 	"fmt"
 
 	"google.golang.org/api/sheets/v4"
+
+	"github.com/mustthink/YouTubeChecker/internal/types"
 )
 
-func (s *VideoStorage) writeToSheet(video Video) error {
+func (s *VideoStorage) writeToSheet(video types.Video) error {
 	values := [][]interface{}{
-		{video.isTracked, video.videoID, video.videoTitle, video.channelID, video.channelTitle, video.description, video.publishDate, video.videoURL, video.thumbnailURL},
+		video.ArrayInterface(),
 	}
 
 	valueRange := &sheets.ValueRange{

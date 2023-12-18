@@ -8,26 +8,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
-	"google.golang.org/api/youtube/v3"
 
 	"github.com/mustthink/YouTubeChecker/config"
+	"github.com/mustthink/YouTubeChecker/internal/notifications"
+	"github.com/mustthink/YouTubeChecker/internal/types"
 )
 
 var exist = struct{}{}
 
 type (
-	Video struct {
-		videoID      string
-		videoTitle   string
-		channelID    string
-		channelTitle string
-		description  string
-		publishDate  string
-		videoURL     string
-		thumbnailURL string
-		isTracked    bool
-	}
-
 	VideoStorage struct {
 		config *config.SheetConfig
 		db     *sql.DB
@@ -70,24 +59,14 @@ func (s *VideoStorage) IsVideoExist(id string) bool {
 	return ok
 }
 
-func (s *VideoStorage) AddNewVideo(v Video) error {
-	s.videos[v.videoID] = exist
+func (s *VideoStorage) AddNewVideo(v types.Video) error {
+	s.videos[v.VideoID] = exist
 	if err := s.InsertVideoToDB(v); err != nil {
 		return err
 	}
-	return s.writeToSheet(v)
-}
-
-func ToVideo(item *youtube.SearchResult, isTracked bool) Video {
-	return Video{
-		videoID:      item.Id.VideoId,
-		videoTitle:   item.Snippet.Title,
-		channelID:    item.Snippet.ChannelId,
-		channelTitle: item.Snippet.ChannelTitle,
-		description:  item.Snippet.Description,
-		publishDate:  item.Snippet.PublishedAt,
-		videoURL:     fmt.Sprintf("https://www.youtube.com/watch?v=%s", item.Id.VideoId),
-		thumbnailURL: item.Snippet.Thumbnails.High.Url,
-		isTracked:    isTracked,
+	if err := s.writeToSheet(v); err != nil {
+		return err
 	}
+	notifications.Send(v)
+	return nil
 }

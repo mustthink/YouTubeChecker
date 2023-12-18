@@ -67,11 +67,17 @@ type (
 		SpreadsheetID   string         `json:"id,omitempty"`
 	}
 
+	NotificationConfig struct {
+		ReceiverID        int64  `json:"receiver_id"`
+		TelegramBotApiKey string `json:"telegram_api_key"`
+	}
+
 	Config struct {
-		TrackedChannelsFilePath string        `json:"tracked_channels"`
-		RequestInterval         time.Duration `json:"interval_in_seconds"`
-		CallerConfig            CallerConfig  `json:"caller"`
-		SheetConfig             SheetConfig   `json:"sheet"`
+		TrackedChannelsFilePath string             `json:"tracked_channels"`
+		RequestInterval         time.Duration      `json:"interval_in_seconds"`
+		CallerConfig            CallerConfig       `json:"caller"`
+		SheetConfig             SheetConfig        `json:"sheet"`
+		NotificatorConfig       NotificationConfig `json:"notificator"`
 
 		trackedChannels map[string]bool
 	}

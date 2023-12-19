@@ -28,6 +28,10 @@ func New(filePath string) (*Config, error) {
 		return nil, fmt.Errorf("couldn't unmarshal configuration w err: %s", err.Error())
 	}
 
+	if err := configuration.fullValidation(); err != nil {
+		return nil, fmt.Errorf("couldn't validate config w err: %s", err.Error())
+	}
+
 	if configuration.TrackedChannelsFilePath == "" {
 		configuration.TrackedChannelsFilePath = DefaultTrackedChannels
 	}
@@ -69,8 +73,8 @@ type (
 	SheetConfig struct {
 		OauthConfig     *oauth2.Config `json:"-"`
 		CredentialsPath string         `json:"credentials_path"`
-		Name            string         `json:"name,omitempty"`
-		SpreadsheetID   string         `json:"id,omitempty"`
+		Name            string         `json:"name"`
+		SpreadsheetID   string         `json:"id"`
 		SheetID         int64          `json:"sheet_id"`
 	}
 

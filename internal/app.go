@@ -93,10 +93,19 @@ func (a *App) ProcessResponse(response *youtube.SearchListResponse) {
 		a.logger.Debugf("videoID: %s", videoID)
 
 		if !a.videoStorage.IsVideoExist(videoID) {
-			video := types.ToVideo(item, a.config.IsChannelTracked(channelID))
+			video, err := types.ToVideo(item, a.config.TimeZoneLocation, a.config.IsChannelTracked(channelID))
+			if err != nil {
+				a.logger.Errorf("couldn't convert response to video w err: %s", err.Error())
+				continue
+			}
+
 			if err := a.videoStorage.AddNewVideo(video); err != nil {
 				a.logger.Errorf("couldn't add new video w err: %s", err.Error())
 			}
 		}
+	}
+
+	if err := a.videoStorage.SortSheet(); err != nil {
+		a.logger.Errorf("couldn't sort sheet w err: %s", err.Error())
 	}
 }

@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 	"time"
 
@@ -20,19 +20,19 @@ const (
 func New(filePath string) (*Config, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't read configuration file w err: %s", err.Error())
 	}
 
 	var configuration Config
 	if err := json.Unmarshal(data, &configuration); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't unmarshal configuration w err: %s", err.Error())
 	}
 
 	if configuration.TrackedChannelsFilePath == "" {
 		configuration.TrackedChannelsFilePath = DefaultTrackedChannels
 	}
 	if err := configuration.loadTrackedChannels(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't load tracked channels w err: %s", err.Error())
 	}
 
 	if configuration.SheetConfig.CredentialsPath == "" {
@@ -40,15 +40,21 @@ func New(filePath string) (*Config, error) {
 	}
 	b, err := os.ReadFile(DefaultCredentials)
 	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
+		return nil, fmt.Errorf("unable to read client secret file: %s", err.Error())
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
 	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsScope)
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		return nil, fmt.Errorf("unable to parse client secret file to config: %s", err.Error())
 	}
 	configuration.SheetConfig.OauthConfig = config
+
+	location, err := time.LoadLocation(configuration.TimeZone)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't load location from time zone w err: %s", err.Error())
+	}
+	configuration.TimeZoneLocation = location
 
 	return &configuration, nil
 }
@@ -65,6 +71,7 @@ type (
 		CredentialsPath string         `json:"credentials_path"`
 		Name            string         `json:"name,omitempty"`
 		SpreadsheetID   string         `json:"id,omitempty"`
+		SheetID         int64          `json:"sheet_id"`
 	}
 
 	NotificationConfig struct {
@@ -75,11 +82,13 @@ type (
 	Config struct {
 		TrackedChannelsFilePath string             `json:"tracked_channels"`
 		RequestInterval         time.Duration      `json:"interval_in_seconds"`
+		TimeZone                string             `json:"time_zone"`
 		CallerConfig            CallerConfig       `json:"caller"`
 		SheetConfig             SheetConfig        `json:"sheet"`
 		NotificatorConfig       NotificationConfig `json:"notificator"`
 
-		trackedChannels map[string]bool
+		TimeZoneLocation *time.Location `json:"-"`
+		trackedChannels  map[string]bool
 	}
 )
 

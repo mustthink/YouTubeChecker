@@ -1,14 +1,16 @@
 {
-  "interval_in_seconds": 600,
+  "interval_in_seconds": 870,
+  "time_zone": "Etc/GMT-3",
   "caller": {
     "count_result": 50,
     "query": "",
-    "api_keys": ["", ""]
+    "api_keys": [""]
   },
   "sheet": {
     "credentials_path": "config/credentials.json",
     "name": "videos",
-    "id": ""
+    "id": "",
+    "sheet_id": 0
   },
   "notificator": {
     "receiver_id": 0,

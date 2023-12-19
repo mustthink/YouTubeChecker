@@ -6,19 +6,24 @@ import (
 	tgBot "github.com/go-telegram-bot-api/telegram-bot-api"
 
 	"github.com/mustthink/YouTubeChecker/config"
-	"github.com/mustthink/YouTubeChecker/internal/types"
 )
 
 var notificator chan string
 
-func Send(v types.Video) {
-	notificator <- v.Info()
+func Send(n Notification) {
+	notificator <- n.Notification()
 }
 
-type Notificator struct {
-	tgBot  *tgBot.BotAPI
-	config config.NotificationConfig
-}
+type (
+	Notificator struct {
+		tgBot  *tgBot.BotAPI
+		config config.NotificationConfig
+	}
+
+	Notification interface {
+		Notification() string
+	}
+)
 
 func New(config config.NotificationConfig) (*Notificator, error) {
 	bot, err := tgBot.NewBotAPI(config.TelegramBotApiKey)

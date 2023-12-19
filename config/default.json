@@ -3,7 +3,7 @@
   "caller": {
     "count_result": 50,
     "query": "",
-    "api_key": ""
+    "api_keys": ["", ""]
   },
   "sheet": {
     "credentials_path": "config/credentials.json",

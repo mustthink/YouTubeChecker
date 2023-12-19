@@ -13,41 +13,46 @@ import (
 )
 
 func New(cfg *config.CallerConfig) (*Caller, error) {
-	service, err := youtube.NewService(context.Background(), option.WithAPIKey(cfg.YouTubeApiKey))
-	if err != nil {
+	calls := make([]*youtube.SearchListCall, 0, len(cfg.YouTubeApiKey))
+	for _, apiKey := range cfg.YouTubeApiKey {
+		service, err := youtube.NewService(context.Background(), option.WithAPIKey(apiKey))
+		if err != nil {
+			return nil, err
+		}
+
+		call := service.Search.List([]string{"snippet"}).
+			Q(cfg.Query).
+			MaxResults(cfg.CountResult).
+			Order("date").
+			Type("video")
+
+		calls = append(calls, call)
+	}
+
+	err := os.Mkdir("internal/caller/responses", 0755)
+	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}
 
-	call := service.Search.List([]string{"snippet"}).
-		Q(cfg.Query).
-		MaxResults(cfg.CountResult).
-		Order("date").
-		Type("video")
-
 	return &Caller{
-		service:   service,
-		call:      call,
+		calls:     calls,
 		config:    cfg,
 		responses: 1,
 	}, nil
 }
 
 type Caller struct {
-	service *youtube.Service
-	call    *youtube.SearchListCall
-	config  *config.CallerConfig
+	calls  []*youtube.SearchListCall
+	config *config.CallerConfig
 
-	responses int
+	apiKeyIter int
+	responses  int
 }
 
 func (c *Caller) FetchNewVideos() (*youtube.SearchListResponse, error) {
-	response, err := c.call.Do()
+	call := c.chooseCall()
+	response, err := call.Do()
 	if err != nil {
-		return nil, err
-	}
-
-	err = os.Mkdir("internal/caller/responses", 0755)
-	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}
 
@@ -61,7 +66,7 @@ func (c *Caller) WriteResponse(response youtube.SearchListResponse) error {
 		return err
 	}
 
-	dataToWrite, err := json.Marshal(response)
+	dataToWrite, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
 		return nil
 	}
@@ -72,4 +77,12 @@ func (c *Caller) WriteResponse(response youtube.SearchListResponse) error {
 
 	c.responses++
 	return newResponse.Close()
+}
+
+func (c *Caller) chooseCall() *youtube.SearchListCall {
+	defer func() { c.apiKeyIter++ }()
+	if c.apiKeyIter == len(c.calls) {
+		c.apiKeyIter = 0
+	}
+	return c.calls[c.apiKeyIter]
 }

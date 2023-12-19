@@ -55,9 +55,9 @@ func New(filePath string) (*Config, error) {
 
 type (
 	CallerConfig struct {
-		CountResult   int64  `json:"count_result"`
-		YouTubeApiKey string `json:"api_key"`
-		Query         string `json:"query"`
+		CountResult   int64    `json:"count_result"`
+		YouTubeApiKey []string `json:"api_keys"`
+		Query         string   `json:"query"`
 	}
 
 	SheetConfig struct {

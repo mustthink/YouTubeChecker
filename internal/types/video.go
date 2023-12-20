@@ -41,7 +41,7 @@ func ToVideo(item *youtube.SearchResult, location *time.Location, isTracked bool
 		ChannelID:    item.Snippet.ChannelId,
 		ChannelTitle: item.Snippet.ChannelTitle,
 		Description:  item.Snippet.Description,
-		PublishDate:  targetTime.Format("2006-01-02 15:04:05"),
+		PublishDate:  targetTime.Format("02.01.2006 15:04"),
 		VideoURL:     fmt.Sprintf("https://www.youtube.com/watch?v=%s", item.Id.VideoId),
 		ThumbnailURL: item.Snippet.Thumbnails.High.Url,
 		IsTracked:    isTracked,

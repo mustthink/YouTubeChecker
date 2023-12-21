@@ -17,8 +17,7 @@ func (s *VideoStorage) writeToSheet(video types.Video) error {
 		Values: values,
 	}
 
-	range_ := fmt.Sprintf("%s!A1", s.config.Name)
-
+	range_ := fmt.Sprintf("%s!A2", s.config.Name)
 	_, err := s.sheets.Spreadsheets.Values.Append(s.config.SpreadsheetID, range_, valueRange).ValueInputOption("RAW").Do()
 	return err
 }
@@ -26,7 +25,7 @@ func (s *VideoStorage) writeToSheet(video types.Video) error {
 func (s *VideoStorage) SortSheet() error {
 	sortRange := &sheets.GridRange{
 		SheetId:          s.config.SheetID,
-		StartRowIndex:    0,
+		StartRowIndex:    1,
 		StartColumnIndex: 0,
 		EndRowIndex:      0,
 		EndColumnIndex:   0,
@@ -34,7 +33,7 @@ func (s *VideoStorage) SortSheet() error {
 
 	sortRequest := sheets.SortRangeRequest{
 		Range:     sortRange,
-		SortSpecs: []*sheets.SortSpec{{DimensionIndex: 6, SortOrder: "DESCENDING"}},
+		SortSpecs: []*sheets.SortSpec{{DimensionIndex: 7, SortOrder: "DESCENDING"}},
 	}
 
 	reqs := []*sheets.Request{

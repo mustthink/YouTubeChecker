@@ -24,6 +24,8 @@ func (c *CallerConfig) validate() error {
 		return emptyFieldError("count_result")
 	case len(c.YouTubeApiKey) == 0:
 		return emptyFieldError("api_keys")
+	case c.TimeZone == "":
+		return emptyFieldError("time_zone")
 	default:
 		return nil
 	}
@@ -55,8 +57,6 @@ func (c *NotificationConfig) validate() error {
 
 func (c *Config) validate() error {
 	switch {
-	case c.TimeZone == "":
-		return emptyFieldError("time_zone")
 	case c.RequestInterval == 0:
 		return emptyFieldError("interval_in_seconds")
 	default:

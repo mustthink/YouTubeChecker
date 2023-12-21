@@ -1,8 +1,8 @@
 {
   "interval_in_seconds": 870,
-  "time_zone": "Etc/GMT-3",
   "caller": {
     "count_result": 50,
+    "time_zone": "Etc/GMT-3",
     "query": "",
     "api_keys": [""]
   },

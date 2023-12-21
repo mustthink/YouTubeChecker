@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"google.golang.org/api/youtube/v3"
 
 	"github.com/mustthink/YouTubeChecker/config"
 	"github.com/mustthink/YouTubeChecker/internal/caller"
@@ -84,21 +83,13 @@ func (a *App) Run() {
 	}
 }
 
-func (a *App) ProcessResponse(response *youtube.SearchListResponse) {
-	for _, item := range response.Items {
-		channelID := item.Snippet.ChannelId
-		a.logger.Debugf("channelID: %s", channelID)
+func (a *App) ProcessResponse(videos []types.Video) {
+	for _, video := range videos {
+		a.logger.Debugf("channelID: %s", video.ChannelID)
+		a.logger.Debugf("videoID: %s", video.VideoID)
 
-		videoID := item.Id.VideoId
-		a.logger.Debugf("videoID: %s", videoID)
-
-		if !a.videoStorage.IsVideoExist(videoID) {
-			video, err := types.ToVideo(item, a.config.TimeZoneLocation, a.config.IsChannelTracked(channelID))
-			if err != nil {
-				a.logger.Errorf("couldn't convert response to video w err: %s", err.Error())
-				continue
-			}
-
+		if !a.videoStorage.IsVideoExist(video.VideoID) {
+			video.IsTracked = a.config.IsChannelTracked(video.ChannelID)
 			if err := a.videoStorage.AddNewVideo(video); err != nil {
 				a.logger.Errorf("couldn't add new video w err: %s", err.Error())
 			}

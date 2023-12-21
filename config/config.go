@@ -54,18 +54,13 @@ func New(filePath string) (*Config, error) {
 	}
 	configuration.SheetConfig.OauthConfig = config
 
-	location, err := time.LoadLocation(configuration.TimeZone)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't load location from time zone w err: %s", err.Error())
-	}
-	configuration.TimeZoneLocation = location
-
 	return &configuration, nil
 }
 
 type (
 	CallerConfig struct {
 		CountResult   int64    `json:"count_result"`
+		TimeZone      string   `json:"time_zone"`
 		YouTubeApiKey []string `json:"api_keys"`
 		Query         string   `json:"query"`
 	}
@@ -86,7 +81,6 @@ type (
 	Config struct {
 		TrackedChannelsFilePath string             `json:"tracked_channels"`
 		RequestInterval         time.Duration      `json:"interval_in_seconds"`
-		TimeZone                string             `json:"time_zone"`
 		CallerConfig            CallerConfig       `json:"caller"`
 		SheetConfig             SheetConfig        `json:"sheet"`
 		NotificatorConfig       NotificationConfig `json:"notificator"`

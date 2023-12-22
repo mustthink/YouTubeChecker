@@ -37,8 +37,8 @@ func (c *SheetConfig) validate() error {
 		return emptyFieldError("name")
 	case c.SpreadsheetID == "":
 		return emptyFieldError("id")
-	case c.SheetID == 0:
-		return emptyFieldError("sheet_id")
+	case c.SheetID < 0:
+		return fmt.Errorf("invalid sheet ID")
 	default:
 		return nil
 	}

@@ -19,7 +19,7 @@ type Video struct {
 }
 
 func (v Video) ArrayInterface() []interface{} {
-	return []interface{}{v.IsTracked, v.VideoID, v.VideoTitle, v.ChannelID, v.ChannelTitle, v.Description, v.PublishDate, v.FetchDate, v.VideoURL, v.ThumbnailURL}
+	return []interface{}{v.IsTracked, v.VideoID, v.VideoTitle, v.Description, v.ChannelID, v.ChannelTitle, v.SubscriberCount, v.PublishDate, v.FetchDate, v.VideoURL, v.ThumbnailURL}
 }
 
 func (v Video) Notification() string {

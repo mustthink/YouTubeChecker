@@ -33,7 +33,7 @@ func (s *VideoStorage) SortSheet() error {
 
 	sortRequest := sheets.SortRangeRequest{
 		Range:     sortRange,
-		SortSpecs: []*sheets.SortSpec{{DimensionIndex: 7, SortOrder: "DESCENDING"}},
+		SortSpecs: []*sheets.SortSpec{{DimensionIndex: 8, SortOrder: "DESCENDING"}},
 	}
 
 	reqs := []*sheets.Request{
